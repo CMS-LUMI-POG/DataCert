@@ -157,6 +157,7 @@ histBCMFLumi={}
 histPLTLumi={}
 histlayers={}
 PCClayers={}
+eventRate={}
 layerColors=[616,1,632,600,416]
 histPU={}
 
@@ -181,6 +182,9 @@ for ient in range(nentries):
         if pcc_dict.has_key((tree.fill, tree.run)):
             pcc_corr=pcc_dict[(tree.fill, tree.run)]
     if tree.hasCMSData:
+        if not eventRate.has_key(tree.run):
+            eventRate[tree.run]=ROOT.TH1F(str(tree.run)+"_eventrate",";Luminosity Section  ;Event Rate (Hz)",nBins[tree.run],0,runLSMax[tree.run])
+        eventRate[tree.run].Fill(tree.LS,tree.eventRate)
         if tree.nCluster>0:
             for layer in range(0,5):
                 layerkey=str(tree.run)+"_PCClayer"+str(layer+1)
@@ -246,7 +250,7 @@ for ient in range(nentries):
                 histPCLumiB3p8[key].Fill(tree.LS,tree.PC_lumi_B3p8*PCCscale*pcc_corr)
         if tree.BestLumi_PU>0:
             histPU[key].Fill(tree.LS,tree.BestLumi_PU*PCCscale*pcc_corr)
-            print tree.BestLumi_PU
+            #print tree.BestLumi_PU
         if tree.HFLumi>0 and tree.BCMFLumi>0 and tree.BestLumi>0:
             # FIXME USE ACTUAL BEST LUMI STRING FROM TREE (NOT IN TREE YET)
             if tree.run not in bestHF.keys():
@@ -268,10 +272,10 @@ for ient in range(nentries):
 
 tcan=ROOT.TCanvas("tcan","",1200*scale,700*scale)
 padlumis =ROOT.TPad("padlumis", "",0.0,0.0,0.5,1.0)
-padpixxsec =ROOT.TPad("padpixxsec","",0.5,0.0,1.0,1.0)
+pad2 =ROOT.TPad("pad2","",0.5,0.0,1.0,1.0)
 
 padlumis.Draw()
-padpixxsec.Draw()
+pad2.Draw()
 
 PC_calib_xsec_B0=9.4e6
 PC_calib_xsec_B3p8=9.4e6
@@ -279,7 +283,8 @@ PC_calib_xsec_B3p8=9.4e6
 for run in runsToCheck:
 
     padlumis.Divide(1,3)
-    padpixxsec.Divide(1,4)
+    pad2.Divide(1,3)
+    #pad2.Divide(1,4)
     lineB0=ROOT.TLine(0,PC_calib_xsec_B0,runLSMax[run],PC_calib_xsec_B0)
     lineB0.SetLineColor(634)
     lineB0.SetLineStyle(ROOT.kDashed)
@@ -299,7 +304,7 @@ for run in runsToCheck:
         if pixhistmax>PC_calib_xsec_B3p8*1.5 or pixhistmax<PC_calib_xsec_B3p8:
             pixhistmax=PC_calib_xsec_B3p8*1.5
 
-        padpixxsec.cd(1)
+        pad2.cd(1)
         histpix[run].SetMaximum(pixhistmax)
         label=ROOT.TText(0,histpix[run].GetMaximum()*0.88,"   Pixel Cluster Cross Section - Run="+str(run))
         label.SetTextSize(.1)
@@ -308,40 +313,47 @@ for run in runsToCheck:
         lineB0.Draw("same")
         lineB3p8.Draw("same")
         legPixXSec.Draw("same")
-        padpixxsec.Update()
+        pad2.Update()
 
-        padpixxsec.cd(2)
-        histpix_HF[run].SetMaximum(pixhistmax)
-        label3=ROOT.TText(0,histpix_HF[run].GetMaximum()*0.88,"   Pixel Cluster Cross Section HF - Run="+str(run))
-        label3.SetTextSize(.1)
-        histpix_HF[run].Draw("hist")
-        label3.Draw("same")
-        lineB0.Draw("same")
-        lineB3p8.Draw("same")
-        legPixXSec.Draw("same")
-        padpixxsec.Update()
+        pad2.cd(2)
+        eventRate[run].SetLineWidth(2)
+        meanRate,meanRateError=GetYAverage(eventRate[run],True)
+        ReStyleHistogram(eventRate[run],3)
+        eventRate[run].Draw("hist")
+        labelRate=ROOT.TText(0,eventRate[run].GetMaximum()*0.4,"      Average Rate in Run="+str(run)+" = "+"{0:.1f}".format(meanRate)+" Hz")
+        labelRate.SetTextSize(.1)
+        labelRate.Draw("same")
+        pad2.Update()
 
-        padpixxsec.cd(3)
-        histpix_BCMF[run].SetMaximum(pixhistmax)
-        label4=ROOT.TText(0,histpix_BCMF[run].GetMaximum()*0.88,"   Pixel Cluster Cross Section BCM1f - Run="+str(run))
-        label4.SetTextSize(.1)
-        histpix_BCMF[run].Draw("hist")
-        label4.Draw("same")
-        lineB0.Draw("same")
-        lineB3p8.Draw("same")
-        legPixXSec.Draw("same")
-        padpixxsec.Update()
+        #pad2.cd(3)
+        #histpix_HF[run].SetMaximum(pixhistmax)
+        #label3=ROOT.TText(0,histpix_HF[run].GetMaximum()*0.88,"   Pixel Cluster Cross Section HF - Run="+str(run))
+        #label3.SetTextSize(.1)
+        #histpix_HF[run].Draw("hist")
+        #label3.Draw("same")
+        #lineB0.Draw("same")
+        #lineB3p8.Draw("same")
+        #legPixXSec.Draw("same")
+        #histpix_BCMF[run].SetMaximum(pixhistmax)
+        #label4=ROOT.TText(0,histpix_BCMF[run].GetMaximum()*0.88,"   Pixel Cluster Cross Section BCM1f - Run="+str(run))
+        #label4.SetTextSize(.1)
+        #histpix_BCMF[run].Draw("hist")
+        #label4.Draw("same")
+        #lineB0.Draw("same")
+        #lineB3p8.Draw("same")
+        #legPixXSec.Draw("same")
+        #pad2.Update()
 
-        padpixxsec.cd(4)
-        histpix_PLT[run].SetMaximum(pixhistmax)
-        label5=ROOT.TText(0,histpix_PLT[run].GetMaximum()*0.88,"   Pixel Cluster Cross Section PLT - Run="+str(run))
-        label5.SetTextSize(.1)
-        histpix_PLT[run].Draw("hist")
-        label5.Draw("same")
-        lineB0.Draw("same")
-        lineB3p8.Draw("same")
-        legPixXSec.Draw("same")
-        padpixxsec.Update()
+        #pad2.cd(4)
+        #histpix_PLT[run].SetMaximum(pixhistmax)
+        #label5=ROOT.TText(0,histpix_PLT[run].GetMaximum()*0.88,"   Pixel Cluster Cross Section PLT - Run="+str(run))
+        #label5.SetTextSize(.1)
+        #histpix_PLT[run].Draw("hist")
+        #label5.Draw("same")
+        #lineB0.Draw("same")
+        #lineB3p8.Draw("same")
+        #legPixXSec.Draw("same")
+        #pad2.Update()
  
     if run in histbest.keys():
         padlumis.cd(1)
@@ -365,29 +377,22 @@ for run in runsToCheck:
         histPLTLumi[run].SetLineColor(601)
         histPLTLumi[run].Draw("histsame")
         histPCLumiB3p8[run].SetLineColor(802)
-	#histPCLumiB3p8[run]= histPCLumiB3p8[run].Integral() * 23.31;
         histPCLumiB3p8[run].Draw("histsame")
-	
-	standInPC	= histPCLumiB3p8[run].Clone("PC")
-	standInHF	= histHFLumi[run].Clone("HF")
-	standInBCMF	= histBCMFLumi[run].Clone("BCMF")
-	standInPLT	= histPLTLumi[run].Clone("PLT")
 
-        mean7=standInPC.Integral()*23.32
-	mean8=standInHF.Integral()*23.32
-	mean9=standInBCMF.Integral()*23.32
-	mean10=standInPLT.Integral()*23.32
-	mean7=mean7*1.0000
+        intLPCC=histPCLumiB3p8[run].Integral()*23.31*1.e-6
+        intLHF=histHFLumi[run].Integral()*23.31*1.e-6
+        intLBCM=histBCMFLumi[run].Integral()*23.31*1.e-6
+        intLPLT=histPLTLumi[run].Integral()*23.31*1.e-6
 
         leg=ROOT.TLegend(0.1,0.1,0.7,0.4)
         tot=1
         try:
             tot=float(bestHF[run]+bestBCM1f[run]+bestPLT[run])
             leg.AddEntry(histbest[run],"Best Lumi","l")
-            leg.AddEntry(histHFLumi[run],"HF: "+"{0:.1f}".format((bestHF[run]/tot)*100)+"%,        Integrated Lumi = "+"{:5.1f}".format(mean8),"l")#+" #pm "+"{:5.1f}".format(meanError8),"l")
-            leg.AddEntry(histBCMFLumi[run],"BCM1f: "+"{0:.1f}".format((bestBCM1f[run]/tot)*100)+"%, Integrated Lumi = "+"{:5.1f}".format(mean9),"l")#+" #pm "+"{:5.1f}".format(meanError9),"l")
-            leg.AddEntry(histPLTLumi[run],"PLT: "+"{0:.1f}".format((bestPLT[run]/tot)*100)+"%,  Integrated Lumi = "+"{:5.1f}".format(mean10),"l")#+" #pm "+"{:5.1f}".format(meanError10),"l")
-            leg.AddEntry(histPCLumiB3p8[run],"PCC - B=3.8,   Integrated Lumi = "+"{:5.1f}".format(mean7),"l")#,"l")
+            leg.AddEntry(histHFLumi[run],"HF: "+"{0:.1f}".format((bestHF[run]/tot)*100)+"%,        Integrated Lumi = "+"{:2.2f}".format(intLHF)+" pb^{-1}","l")
+            leg.AddEntry(histBCMFLumi[run],"BCM1f: "+"{0:.1f}".format((bestBCM1f[run]/tot)*100)+"%, Integrated Lumi = "+"{:2.2f}".format(intLBCM)+" pb^{-1}","l")
+            leg.AddEntry(histPLTLumi[run],"PLT: "+"{0:.1f}".format((bestPLT[run]/tot)*100)+"%,  Integrated Lumi = "+"{:2.2f}".format(intLPLT)+" pb^{-1}","l")
+            leg.AddEntry(histPCLumiB3p8[run],"PCC - B=3.8,   Integrated Lumi = "+"{:2.2f}".format(intLPCC)+" pb^{-1}","l")
 
             leg.SetFillStyle(0)
             leg.SetBorderSize(0)
@@ -444,6 +449,7 @@ for run in runsToCheck:
 
 
         leg2=ROOT.TLegend(0.1,0.7,0.5,0.9)
+        print mean1,meanError1
         leg2.AddEntry(BestOPCLumi, "Best/PCLumi       =   "+"{:10.4f}".format(mean1)+" #pm "+"{:10.4f}".format(meanError1),"l")
         leg2.AddEntry(HFOPCLumi,   "HF/PCLumi         =   "+"{:10.4f}".format(mean2)+" #pm "+"{:10.4f}".format(meanError2),"l")
         leg2.AddEntry(BCM1FOPCLumi,"BCM1F/PCLumi  =   "+"{:10.4f}".format(mean3)+" #pm "+"{:10.4f}".format(meanError3),"l")
@@ -469,7 +475,7 @@ for run in runsToCheck:
 
     #raw_input()
     padlumis.Clear()
-    padpixxsec.Clear()
+    pad2.Clear()
     tcan.Update()
 
     if run in bothSets:
