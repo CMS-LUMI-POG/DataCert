@@ -168,6 +168,8 @@ maxLS={}
 goodVertexCounts={}
 validVertexCounts={}
 PCCsPerLS={}
+eventRates={}
+nBXs={}
 lumiEstimate={}
 # key is bx,LS and LS
 
@@ -211,7 +213,8 @@ if args.pccfile!="":
             continue
         
         LSKey=(tree.run,tree.LS)
-        
+        eventRates[LSKey]=tree.eventCounter/23.31
+        nBXs[LSKey]=len(tree.BXNo)
         if args.includeVertices:
             if LSKey not in goodVertexCounts:
                 goodVertexCounts[LSKey]=[]
@@ -326,6 +329,7 @@ fill= array.array( 'I', [ 0 ] )
 run = array.array( 'I', [ 0 ] )
 LS  = array.array( 'I', [ 0 ] )
 nBX = array.array( 'I', [ 0 ] )
+eventRate  = array.array( 'd', [ 0 ] )
 nActiveBX = array.array( 'I', [ 0 ] )
 nBXHF = array.array( 'I', [ 0 ] )
 nBXBCMF = array.array( 'I', [ 0 ] )
@@ -395,6 +399,7 @@ validVertices_perBX_eff  = array.array( 'd', 3600*[ 0 ] )
 newtree.Branch("fill",fill,"fill/I")
 newtree.Branch("run",run,"run/I")
 newtree.Branch("LS",LS,"LS/I")
+newtree.Branch("eventRate",eventRate,"eventRate/D")
 newtree.Branch("nActiveBX",nActiveBX,"nActiveBX/I")
 newtree.Branch("nBX",nBX,"nBX/I")
 newtree.Branch("nBXHF", nBXHF, "nBXHF/I")
@@ -597,7 +602,9 @@ for key in LSKeys:
     if key in cmskeys:
         try:
             hasCMSData[0]=True
-            nBX[0]=len(tree.BXNo)
+            nBX[0]=nBXs[key]
+            eventRate[0]=eventRates[key]
+
             count=0
             if args.includeVertices:
                 goodVertices[0]=AverageWithWeight(goodVertexCounts[key][0])
