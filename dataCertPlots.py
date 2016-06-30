@@ -20,6 +20,9 @@ ROOT.gStyle.SetPadTickY(2)
 
 pcc_dict={}
 
+miss_LS = []
+
+
 if args.csv!="":
     file = open(args.csv)
     lines = file.readlines()
@@ -226,6 +229,8 @@ for ient in range(nentries):
         for layer in range(0,5):
             histlayers[str(tree.run)+"_layer"+str(layer+1)].Fill(tree.LS,tree.PC_xsec_layers[layer]*PCCscale*pcc_corr)
 
+    if tree.BestLumi<=0 and tree.HFLumi<=0 and tree.BCMFLumi<=0 and tree.PLTLumi<=0 and tree.PC_lumi_B3p8>0:
+        miss_LS.append([str(tree.run), str(tree.LS)])
     if tree.hasBrilData:
         key=tree.run
         if not histbest.has_key(key):
@@ -241,6 +246,8 @@ for ient in range(nentries):
             ReStyleHistogram(histBCMFLumi[key],3)
             ReStyleHistogram(histPLTLumi[key],3)
             ReStyleHistogram(histPU[key],3)
+        if tree.BestLumi<=0 and tree.HFLumi<=0 and tree.BCMFLumi<=0 and tree.PLTLumi<=0 and tree.PC_lumi_B3p8>0:
+            miss_LS.append([key, str(tree.LS)])
         if tree.BestLumi>0:#This is where it is fed in
             histbest[key].Fill(tree.LS,tree.BestLumi)
             histHFLumi[key].Fill(tree.LS,tree.HFLumi)
@@ -277,8 +284,8 @@ pad2 =ROOT.TPad("pad2","",0.5,0.0,1.0,1.0)
 padlumis.Draw()
 pad2.Draw()
 
-PC_calib_xsec_B0=9.4e6
-PC_calib_xsec_B3p8=9.4e6
+PC_calib_xsec_B0=9.0e6
+PC_calib_xsec_B3p8=9.0e6
 
 for run in runsToCheck:
 
@@ -530,3 +537,5 @@ for run in runsToCheck:
         stabLeg.Draw("same")
         stability.Update()
         stability.SaveAs(args.outDir+str(run)+"_stability.png")
+
+print "Missing LSs: ",miss_LS

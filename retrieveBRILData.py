@@ -57,13 +57,13 @@ def CallBrilcalcForLumiAndProcess(onlineLumiDict,type="best"):
         lumiCMD.extend(["--xing"])
     if args.normtag:
         if type is "best":
-            lumiCMD.extend(["--normtag", "/afs/cern.ch/user/s/stickzh/public/normtag_BRIL.json"])
+            lumiCMD.extend(["--normtag", "/afs/cern.ch/user/c/cmsbril/public/2016normtags/normtag_BRIL.json"])
         if type is "PLTZERO":
-            lumiCMD.extend(["--normtag", "/afs/cern.ch/user/s/stickzh/public/normtag_pltzero.json"])
+            lumiCMD.extend(["--normtag", "/afs/cern.ch/user/c/cmsbril/public/2016normtags/normtag_pltzero.json"])
         if type is "HFOC":
-            lumiCMD.extend(["--normtag", "/afs/cern.ch/user/s/stickzh/public/normtag_hfoc.json"])
+            lumiCMD.extend(["--normtag", "/afs/cern.ch/user/c/cmsbril/public/2016normtags/normtag_hfoc.json"])
         if type is "BCM1F":
-            lumiCMD.extend(["--normtag", "/afs/cern.ch/user/s/stickzh/public/normtag_bcm1f.json"])
+            lumiCMD.extend(["--normtag", "/afs/cern.ch/user/c/cmsbril/public/2016normtags/normtag_bcm1f.json"])
     if type is not "best":
         lumiCMD.append("--type="+type)
     print lumiCMD
