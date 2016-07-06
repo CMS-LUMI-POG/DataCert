@@ -312,10 +312,12 @@ if "runInfo" in brilkeys:
 LSKeys=list(set(cmskeys+brilkeys))
 # if batch only look at keys in both
 if args.isBatch:
-    if args.nobril or args.beamonly:
-        LSKeys=cmskeys
-    else:
-        LSKeys=list(set(cmskeys).intersection(brilkeys))
+    #Always store PCC data even when there is no corresponding BRIL data
+    LSKeys=cmskeys
+    #if args.nobril or args.beamonly:
+    #    LSKeys=cmskeys
+    #else:
+    #    LSKeys=list(set(cmskeys).intersection(brilkeys))
     
 LSKeys.sort()
 

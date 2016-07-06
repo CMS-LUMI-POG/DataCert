@@ -20,6 +20,9 @@ ROOT.gStyle.SetPadTickY(2)
 
 pcc_dict={}
 
+miss_LS = []
+
+
 if args.csv!="":
     file = open(args.csv)
     lines = file.readlines()
@@ -225,6 +228,9 @@ for ient in range(nentries):
 
         for layer in range(0,5):
             histlayers[str(tree.run)+"_layer"+str(layer+1)].Fill(tree.LS,tree.PC_xsec_layers[layer]*PCCscale*pcc_corr)
+
+    if tree.BestLumi<=0 and tree.HFLumi<=0 and tree.BCMFLumi<=0 and tree.PLTLumi<=0 and tree.PC_lumi_B3p8>0:
+        miss_LS.append([str(tree.run), str(tree.LS)])
 
     if tree.hasBrilData:
         key=tree.run
@@ -530,3 +536,5 @@ for run in runsToCheck:
         stabLeg.Draw("same")
         stability.Update()
         stability.SaveAs(args.outDir+str(run)+"_stability.png")
+
+print "Missing LSs: ",miss_LS
