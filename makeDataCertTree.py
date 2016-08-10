@@ -344,6 +344,7 @@ nBXPLT = array.array( 'I', [ 0 ] )
 nCluster    = array.array( 'd', [ 0 ] )
 nClusterError    = array.array( 'd', [ 0 ] )
 nPCPerLayer = array.array( 'd', 5*[ 0 ] )
+nTrigger = array.array('d', [ 0 ] )
 
 HFLumi    = array.array( 'd', [ 0 ] )
 BCMFLumi  = array.array( 'd', [ 0 ] )
@@ -384,25 +385,26 @@ PC_xsec_layers  = array.array( 'd', 5*[ 0 ] )
 nPCPerBXid  = array.array( 'd', 3600*[ 0 ] )
 PCBXid        = array.array( 'I', 3600*[ 0 ] )
 
+
 goodVertices  = array.array( 'd', [ 0 ] )
-goodVertices_pLumi = array.array('d', [ 0 ] )
+goodVertices_Lumi = array.array('d', [ 0 ] )
 goodVertices_xsec  = array.array( 'd', [ 0 ] )
 goodVertices_eff  = array.array( 'd', [ 0 ] )
 
 
 goodVertices_perBX  = array.array( 'd', 3600*[ 0 ] )
-goodVertices_pLumi_perBX = array.array( 'd', 3600*[ 0 ] )
+goodVertices_Lumi_perBX = array.array( 'd', 3600*[ 0 ] )
 goodVertices_perBX_xsec  = array.array( 'd', 3600*[ 0 ] )
 goodVertices_perBX_eff  = array.array( 'd', 3600*[ 0 ] )
 
 
 validVertices  = array.array( 'd', [ 0 ] )
-validVertices_pLumi = array.array( 'd', [ 0 ] )
+validVertices_Lumi = array.array( 'd', [ 0 ] )
 validVertices_xsec  = array.array( 'd', [ 0 ] )
 validVertices_eff  = array.array( 'd', [ 0 ] )
 
 validVertices_perBX  = array.array( 'd', 3600*[ 0 ] )
-validVertices_pLumi_perBX = array.array( 'd', 3600*[ 0 ] )
+validVertices_Lumi_perBX = array.array( 'd', 3600*[ 0 ] )
 validVertices_perBX_xsec  = array.array( 'd', 3600*[ 0 ] )
 validVertices_perBX_eff  = array.array( 'd', 3600*[ 0 ] )
 
@@ -463,20 +465,20 @@ newtree.Branch("hasBrilData",hasBrilData,"hasBrilData/O")
 newtree.Branch("hasCMSData",hasCMSData,"hasCMSData/O")
 
 newtree.Branch("goodVertices",      goodVertices,     "goodVertices/D")
-newtree.Branch("goodVertices_pLumi", goodVertices_pLumi,    "goodVertices/D")
+newtree.Branch("goodVertices_Lumi", goodVertices_Lumi,    "goodVertices/D")
 newtree.Branch("goodVertices_xsec", goodVertices_xsec,"goodVertices_xsec/D")
 newtree.Branch("goodVertices_eff",  goodVertices_eff, "goodVertices_eff/D")
 newtree.Branch("goodVertices_perBX",      goodVertices_perBX,     "goodVertices_perBX[nBX]/D")
-newtree.Branch("goodVertices_pLumi_perBX", goodVertices_pLumi_perBX, "goodVertices_pLumi_perBX[nBX]/D")
+newtree.Branch("goodVertices_Lumi_perBX", goodVertices_Lumi_perBX, "goodVertices_Lumi_perBX[nBX]/D")
 newtree.Branch("goodVertices_perBX_xsec", goodVertices_perBX_xsec,"goodVertices_perBX_xsec[nBX]/D")
 newtree.Branch("goodVertices_perBX_eff",  goodVertices_perBX_eff, "goodVertices_perBX_eff[nBX]/D")
 
 newtree.Branch("validVertices",      validVertices,     "validVertices/D")
-newtree.Branch("validVertices_pLumi", validVertices_pLumi, "validVertices_pLumi/D")
+newtree.Branch("validVertices_Lumi", validVertices_Lumi, "validVertices_Lumi/D")
 newtree.Branch("validVertices_xsec", validVertices_xsec,"validVertices_xsec/D")
 newtree.Branch("validVertices_eff",  validVertices_eff, "validVertices_eff/D")
 newtree.Branch("validVertices_perBX",      validVertices_perBX,     "validVertices_perBX[nBX]/D")
-newtree.Branch("validVertices_pLumi_perBX", validVertices_pLumi_perBX, "validVertices_pLumi_perBX[nBX]/D")
+newtree.Branch("validVertices_Lumi_perBX", validVertices_Lumi_perBX, "validVertices_Lumi_perBX[nBX]/D")
 newtree.Branch("validVertices_perBX_xsec", validVertices_perBX_xsec,"validVertices_perBX_xsec[nBX]/D")
 newtree.Branch("validVertices_perBX_eff",  validVertices_perBX_eff, "validVertices_perBX_eff[nBX]/D")
 
@@ -680,19 +682,19 @@ for key in LSKeys:
             totalOrbitsPerLS=math.pow(2,18)*nActiveBX[0]
             PC_xsec[0]=nCluster[0]/BestLumi_integrated[0]*totalOrbitsPerLS
             if args.includeVertices:
-                goodVertices_pLumi[0]=goodVertices[0]*totalOrbitsPerLS
+                goodVertices_Lumi[0]=goodVertices[0]*totalOrbitsPerLS/(1e6)
                 goodVertices_xsec[0]=goodVertices[0]/BestLumi_integrated[0]*totalOrbitsPerLS
                 goodVertices_eff[0]=goodVertices_xsec[0]/xsec_ub
-                validVertices_pLumi[0]=validVertices[0]*totalOrbitsPerLS
+                validVertices_Lumi[0]=validVertices[0]*totalOrbitsPerLS
                 validVertices_xsec[0]=validVertices[0]/BestLumi_integrated[0]*totalOrbitsPerLS
                 validVertices_eff[0]=validVertices_xsec[0]/xsec_ub
                 ibx=0
                 for bxid in bxids:
                     # FIXME I should really use the lumi for this bx and not multiply by number of bxs
-                    goodVertices_pLumi_perBX[ibx]=goodVertices_pLumi_perBX[ibx]*totalOrbitsPerLS
+                    goodVertices_Lumi_perBX[ibx]=goodVertices_Lumi_perBX[ibx]*totalOrbitsPerLS/(1e6)
                     goodVertices_perBX_xsec[ibx]=goodVertices_perBX[ibx]/BestLumi_integrated[0]*math.pow(2,18)*nActiveBX[0]
                     goodVertices_perBX_eff[ibx]=goodVertices_perBX_xsec[ibx]/xsec_ub
-                    validVertices_pLumi_perBX[ibx]=validVertices_perBX[ibx]*totalOrbitsPerLS
+                    validVertices_Lumi_perBX[ibx]=validVertices_perBX[ibx]*totalOrbitsPerLS
                     validVertices_perBX_xsec[ibx]=validVertices_perBX[ibx]/BestLumi_integrated[0]*math.pow(2,18)*nActiveBX[0]
                     validVertices_perBX_eff[ibx]=validVertices_perBX_xsec[ibx]/xsec_ub
                     ibx=ibx+1

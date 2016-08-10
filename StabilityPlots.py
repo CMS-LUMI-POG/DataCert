@@ -50,8 +50,8 @@ runLS_keys.sort()
 tree.SetBranchStatus("HFLumi", 1)
 tree.SetBranchStatus("PLTLumi", 1)
 tree.SetBranchStatus("PC_lumi_B3p8", 1)
-tree.SetBranchStatus("goodVertices_pLumi", 1)
-tree.SetBranchStatus("validVertices_pLumi", 1)
+tree.SetBranchStatus("goodVertices_Lumi", 1)
+tree.SetBranchStatus("validVertices_Lumi", 1)
 
 Bin_idx={}
 hflumi_dict={}
@@ -66,8 +66,8 @@ for iev in range(nentries):
     hflumi_dict[(tree.run, tree.LS)]=tree.HFLumi
     pltlumi_dict[(tree.run, tree.LS)]=tree.PLTLumi
     pclumi_dict[(tree.run, tree.LS)]=tree.PC_lumi_B3p8
-    goodvtx_dict[(tree.run, tree.LS)]=tree.goodVertices_pLumi
-    validvtx_dict[(tree.run, tree.LS)]=tree.validVertices_pLumi
+    goodvtx_dict[(tree.run, tree.LS)]=tree.goodVertices_Lumi
+    validvtx_dict[(tree.run, tree.LS)]=tree.validVertices_Lumi
 
 nLS = len(Bin_idx)
 combined_LS = 10
@@ -174,34 +174,35 @@ for nbin in range(nLS):
     histhfgoodvtx.SetBinError(nbin,0)
     histpltgoodvtx.SetBinError(nbin,0)
     histhfvalidvtx.SetBinError(nbin,0)
+    histpltvalidvtx.SetBinError(nbin,0)
 
 histhfpc.GetYaxis().SetRangeUser(0.7,1.2)
 histpltpc.GetYaxis().SetRangeUser(0.7,1.2)
 
-histhfgoodvtx.GetYaxis().SetRangeUser(0.7*1e-6, 1.2*1e-6)
-histpltgoodvtx.GetYaxis().SetRangeUser(0.7*1e-6, 1.2*1e-6)
+histhfgoodvtx.GetYaxis().SetRangeUser(0.7, 1.2)
+histpltgoodvtx.GetYaxis().SetRangeUser(0.7, 1.2)
 
 histhfpc.Draw("P")
-tcan.SaveAs("ratio_hfpc.png")
-tcan.SaveAs("ratio_hfpc.eps")
+tcan.SaveAs("ratio_hfpc_"+args.label+".png")
+tcan.SaveAs("ratio_hfpc_"+args.label+".eps")
 
 tcan.Clear()
 tcan.Update()
 histpltpc.Draw("P")
-tcan.SaveAs("ratio_pltpc.png")
-tcan.SaveAs("ratio_pltpc.eps")
+tcan.SaveAs("ratio_pltpc_"+args.label+".png")
+tcan.SaveAs("ratio_pltpc_"+args.label+".eps")
 
 tcan.Clear()
 tcan.Update()
 histhfgoodvtx.Draw("P")
-tcan.SaveAs("ratio_hfgoodvtx.png")
-tcan.SaveAs("ratio_hfgoodvtx.eps")
+tcan.SaveAs("ratio_hfgoodvtx_"+args.label+".png")
+tcan.SaveAs("ratio_hfgoodvtx_"+args.label+".eps")
 
 tcan.Clear()
 tcan.Update()
 histpltgoodvtx.Draw("P")
-tcan.SaveAs("ratio_pltgoodvtx.png")
-tcan.SaveAs("ratio_pltgoodvtx.eps")
+tcan.SaveAs("ratio_pltgoodvtx_"+args.label+".png")
+tcan.SaveAs("ratio_pltgoodvtx_"+args.label+".eps")
 #histhfpc.Draw()
 newfile.WriteTObject(histhfpc, "histhfpc")
 newfile.WriteTObject(histpltpc, "histpltpc")
