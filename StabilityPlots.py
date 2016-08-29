@@ -194,7 +194,7 @@ for key in runLS_keys:
             histpltpc.Fill((int)(Bin_idx[key]/combined_LS), sum_pltlumi/sum_pclumi)
             histgoodvtx_corr_pc.Fill((int)(Bin_idx[key]/combined_LS), sum_goodvtx_corr/sum_pclumi)            
 
-            if nBX_dict[key]!=0 and fill_dict[key]>5197 and fill_dict[key]<5205: 
+            if nBX_dict[key]!=0: 
                 gra_goodvtxpcc.SetPoint(iPoint, sum_pclumi/combined_LS/nBX_dict[key], sum_goodvtx/sum_pclumi)
                 gra_tightvtxpcc.SetPoint(iPoint, sum_pclumi/combined_LS/nBX_dict[key], sum_tightvtx/sum_pclumi)
                 pro_goodvtxpcc.Fill(sum_pclumi/combined_LS/nBX_dict[key], sum_goodvtx/sum_pclumi, 1)
