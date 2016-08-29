@@ -34,6 +34,10 @@ tcan.SetTickx()
 #Non-linearity Correction for Good Vertices
 p0=0.9633
 p1=0.0529 
+#Non-linearity Correction for Good Vertices after HIP was fixed
+new_p0=1.0481#1.0657
+new_p1=0.01323#0.006888
+
 #Overall Scale for Good Vertices
 N=0.8691
 #Overall Scale Factor for Tight Vertices
@@ -118,6 +122,10 @@ histpltgoodvtx.Sumw2()
 histpltgoodvtx_corr = ROOT.TH1F("histpltgoodvtx_corr", ";Fill, Lumi Section; PLT/GoodVtx_corr", nLS, 0, nLS)
 histpltgoodvtx_corr.Sumw2()
 
+histgoodvtx_corr_pc = ROOT.TH1F("histgoodvtx_corr_pc", ";Fill, Lumi Section; GoodVtx_corr/PCC", nLS, 0, nLS)
+histgoodvtx_corr_pc.Sumw2()
+
+
 histplttightvtx =ROOT.TH1F("histplttightvtx", ";Fill, Lumi Section; PLT/TightVtx", nLS, 0, nLS)
 histplttightvtx.Sumw2()
 
@@ -157,6 +165,7 @@ for key in runLS_keys:
         histpltgoodvtx.GetXaxis().SetBinLabel((int)(Bin_idx[key]/combined_LS)+1,str(cur_run))
         histhfgoodvtx_corr.GetXaxis().SetBinLabel((int)(Bin_idx[key]/combined_LS)+1, str(cur_run))
         histpltgoodvtx_corr.GetXaxis().SetBinLabel((int)(Bin_idx[key]/combined_LS)+1, str(cur_run))
+        histgoodvtx_corr_pc.GetXaxis().SetBinLabel((int)(Bin_idx[key]/combined_LS)+1, str(cur_run))
         histhftightvtx.GetXaxis().SetBinLabel((int)(Bin_idx[key]/combined_LS)+1,str(cur_run))
         histplttightvtx.GetXaxis().SetBinLabel((int)(Bin_idx[key]/combined_LS)+1,str(cur_run))
         histhfvalidvtx.GetXaxis().SetBinLabel((int)(Bin_idx[key]/combined_LS)+1,str(cur_run)) 
@@ -172,37 +181,45 @@ for key in runLS_keys:
         
         if nBX_dict[key]!=0:
             SBIL_goodvtx=goodvtx_dict[key]/nBX_dict[key]
-            sum_goodvtx_corr+=N*(p0*SBIL_goodvtx+p1*SBIL_goodvtx*SBIL_goodvtx)*nBX_dict[key]
+            if fill_dict[key]<5198:
+                sum_goodvtx_corr+=N*(p0*SBIL_goodvtx+p1*SBIL_goodvtx*SBIL_goodvtx)*nBX_dict[key]
+            else:
+                sum_goodvtx_corr+=N*(new_p0*SBIL_goodvtx+new_p1*SBIL_goodvtx*SBIL_goodvtx)*nBX_dict[key]
+
             print sum_goodvtx, sum_goodvtx_corr
 
     if count == combined_LS-1:
         if sum_pclumi!=0: 
             histhfpc.Fill((int)(Bin_idx[key]/combined_LS), sum_hflumi/sum_pclumi)
             histpltpc.Fill((int)(Bin_idx[key]/combined_LS), sum_pltlumi/sum_pclumi)
+            histgoodvtx_corr_pc.Fill((int)(Bin_idx[key]/combined_LS), sum_goodvtx_corr/sum_pclumi)            
 
-            if nBX_dict[key]!=0:
+            if nBX_dict[key]!=0 and fill_dict[key]>5197 and fill_dict[key]<5205: 
                 gra_goodvtxpcc.SetPoint(iPoint, sum_pclumi/combined_LS/nBX_dict[key], sum_goodvtx/sum_pclumi)
                 gra_tightvtxpcc.SetPoint(iPoint, sum_pclumi/combined_LS/nBX_dict[key], sum_tightvtx/sum_pclumi)
                 pro_goodvtxpcc.Fill(sum_pclumi/combined_LS/nBX_dict[key], sum_goodvtx/sum_pclumi, 1)
-                pro_pccgoodvtx.Fill(sum_goodvtx/combined_LS/nBX_dict[key], sum_pclumi/sum_goodvtx, 1)
-                pro_hfgoodvtxcorr.Fill(sum_goodvtx_corr/combined_LS/nBX_dict[key], sum_hflumi/sum_goodvtx_corr, 1)
                 pro_tightvtxpcc.Fill(sum_pclumi/combined_LS/nBX_dict[key], sum_tightvtx/sum_pclumi, 1)
-                pro_pcctightvtx.Fill(sum_tightvtx/combined_LS/nBX_dict[key], sum_pclumi/sum_tightvtx, 1)
             
             iPoint+=1
 
         if sum_goodvtx!=0:
             histhfgoodvtx.Fill((int)(Bin_idx[key]/combined_LS), sum_hflumi/sum_goodvtx)
             histpltgoodvtx.Fill((int)(Bin_idx[key]/combined_LS), sum_pltlumi/sum_goodvtx)
+            if nBX_dict[key]!=0:
+                pro_pccgoodvtx.Fill(sum_goodvtx/combined_LS/nBX_dict[key], sum_pclumi/sum_goodvtx, 1)          
 
         if sum_goodvtx_corr!=0:
             histhfgoodvtx_corr.Fill((int)(Bin_idx[key]/combined_LS), sum_hflumi/sum_goodvtx_corr)
             histpltgoodvtx_corr.Fill((int)(Bin_idx[key]/combined_LS), sum_pltlumi/sum_goodvtx_corr)
+            if nBX_dict[key]!=0:
+                pro_hfgoodvtxcorr.Fill(sum_goodvtx_corr/combined_LS/nBX_dict[key], sum_hflumi/sum_goodvtx_corr, 1)
 
         if sum_tightvtx!=0:
             histhftightvtx.Fill((int)(Bin_idx[key]/combined_LS), sum_hflumi/sum_tightvtx)
             histplttightvtx.Fill((int)(Bin_idx[key]/combined_LS), sum_pltlumi/sum_tightvtx)
-        
+            if nBX_dict[key]!=0:
+                pro_pcctightvtx.Fill(sum_tightvtx/combined_LS/nBX_dict[key], sum_pclumi/sum_tightvtx, 1)
+            
         if sum_validvtx!=0:
             histhfvalidvtx.Fill((int)(Bin_idx[key]/combined_LS), sum_hflumi/sum_validvtx)
             histpltvalidvtx.Fill((int)(Bin_idx[key]/combined_LS), sum_pltlumi/sum_validvtx)
@@ -250,6 +267,11 @@ histpltgoodvtx_corr.SetMarkerColor(ROOT.kBlue)
 histpltgoodvtx_corr.SetMarkerStyle(23)
 histpltgoodvtx_corr.GetXaxis().SetNdivisions(404)
 
+histgoodvtx_corr_pc.SetMarkerSize(0.4)
+histgoodvtx_corr_pc.SetMarkerColor(ROOT.kBlue)
+histgoodvtx_corr_pc.SetMarkerStyle(23)
+histgoodvtx_corr_pc.GetXaxis().SetNdivisions(404)
+
 histhftightvtx.SetMarkerSize(0.4)
 histhftightvtx.SetMarkerColor(ROOT.kBlue)
 histhftightvtx.SetMarkerStyle(23)
@@ -281,6 +303,7 @@ for nbin in range(nLS):
     histpltgoodvtx.SetBinError(nbin,0)
     histhfgoodvtx_corr.SetBinError(nbin, 0)
     histpltgoodvtx_corr.SetBinError(nbin, 0)
+    histgoodvtx_corr_pc.SetBinError(nbin, 0)
     histhftightvtx.SetBinError(nbin,0)
     histplttightvtx.SetBinError(nbin,0)
     histhfvalidvtx.SetBinError(nbin,0)
@@ -294,6 +317,8 @@ histpltgoodvtx.GetYaxis().SetRangeUser(0.7, 1.2)
 
 histhfgoodvtx_corr.GetYaxis().SetRangeUser(0.7, 1.2)
 histpltgoodvtx_corr.GetYaxis().SetRangeUser(0.7, 1.2)
+
+histgoodvtx_corr_pc.GetYaxis().SetRangeUser(0.7, 1.2)
 
 histhftightvtx.GetYaxis().SetRangeUser(0.7, 1.2)
 histplttightvtx.GetYaxis().SetRangeUser(0.7, 1.2)
@@ -355,6 +380,7 @@ newfile.WriteTObject(histhfgoodvtx, "histhfgoodvtx")
 newfile.WriteTObject(histpltgoodvtx, "histpltgoodvtx")
 newfile.WriteTObject(histhfgoodvtx_corr, "histhfgoodvtx_corr")
 newfile.WriteTObject(histpltgoodvtx_corr, "histpltgoodvtx_corr")
+newfile.WriteTObject(histgoodvtx_corr_pc, "histgoodvtx_corr_pc")
 newfile.WriteTObject(histhftightvtx, "histhftightvtx")
 newfile.WriteTObject(histplttightvtx, "histplttightvtx")
 newfile.WriteTObject(histhfvalidvtx, "histhfvalidvtx")
@@ -366,5 +392,6 @@ newfile.WriteTObject(pro_pccgoodvtx, "pro_pccgoodvtx")
 newfile.WriteTObject(pro_hfgoodvtxcorr, "pro_hfgoodvtxcorr")
 newfile.WriteTObject(pro_tightvtxpcc, "pro_tightvtxpcc")
 newfile.WriteTObject(pro_pcctightvtx, "pro_pcctightvtx")
+
 
 newfile.Close()

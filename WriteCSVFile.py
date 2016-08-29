@@ -34,6 +34,10 @@ runLS_keys = []
 #Non-linearity Correction for Good Vertices
 p0=0.9633
 p1=0.0529
+#Non-linearity Correction for Good Vertices after HIP was fixed
+new_p0=1.0657
+new_p1=0.006888
+
 #Overall Scale for Good Vertices
 N=0.8691
 #Overall Scale Factor for Tight Vertices
@@ -54,6 +58,7 @@ tree.SetBranchStatus("goodVertices_Lumi", 1)
 tree.SetBranchStatus("tightVertices_Lumi", 1)
 
 
+fill_dict={}
 nBX_dict={}
 hflumi_dict={}
 pltlumi_dict={}
@@ -64,6 +69,7 @@ tightvtx_dict={}
 
 for iev in range(nentries):
     tree.GetEntry(iev)
+    fill_dict[(tree.run, tree.LS)] = tree.fill
     nBX_dict[(tree.run, tree.LS)] = tree.nActiveBX
     hflumi_dict[(tree.run, tree.LS)] = tree.HFLumi
     pltlumi_dict[(tree.run, tree.LS)] = tree.PLTLumi
@@ -74,7 +80,11 @@ for iev in range(nentries):
 
 for key in runLS_keys:
     SBIL_goodvtx=  goodvtx_dict[key]/nBX_dict[key]
-    outfile.write("run,"+str(key[0])+",LS,"+str(key[1])+",HFLumi,"+str(hflumi_dict[key])+",PLTLumi,"+str(pltlumi_dict[key])+",PCCLumi,"+str(pclumi_dict[key])+",GoodVtxLumi,"+str(goodvtx_dict[key])+",TightVtxLumi,"+str(Nt*tightvtx_dict[key])+",GoodVtxLumi_Corr,"+str(N*(p0*SBIL_goodvtx+p1*SBIL_goodvtx*SBIL_goodvtx)*nBX_dict[key])+",nActiveBX,"+str(nBX_dict[key])+"\n")
+    if fill_dict[key]<5198:
+        outfile.write("run,"+str(key[0])+",LS,"+str(key[1])+",HFLumi,"+str(hflumi_dict[key])+",PLTLumi,"+str(pltlumi_dict[key])+",PCCLumi,"+str(pclumi_dict[key])+",GoodVtxLumi,"+str(goodvtx_dict[key])+",TightVtxLumi,"+str(Nt*tightvtx_dict[key])+",GoodVtxLumi_Corr,"+str(N*(p0*SBIL_goodvtx+p1*SBIL_goodvtx*SBIL_goodvtx)*nBX_dict[key])+",nActiveBX,"+str(nBX_dict[key])+"\n")
+
+    else:
+        outfile.write("run,"+str(key[0])+",LS,"+str(key[1])+",HFLumi,"+str(hflumi_dict[key])+",PLTLumi,"+str(pltlumi_dict[key])+",PCCLumi,"+str(pclumi_dict[key])+",GoodVtxLumi,"+str(goodvtx_dict[key])+",TightVtxLumi,"+str(Nt*tightvtx_dict[key])+",GoodVtxLumi_Corr,"+str(N*(new_p0*SBIL_goodvtx+new_p1*SBIL_goodvtx*SBIL_goodvtx)*nBX_dict[key])+",nActiveBX,"+str(nBX_dict[key])+"\n")
 
 
 outfile.close()
