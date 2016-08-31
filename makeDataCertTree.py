@@ -166,6 +166,7 @@ print "Duration: ",endTime-startTime
 maxLS={}
     
 goodVertexCounts={}
+tightVertexCounts={}
 validVertexCounts={}
 PCCsPerLS={}
 eventRates={}
@@ -192,6 +193,7 @@ if args.pccfile!="":
     tree.SetBranchStatus("*",0)
     if args.includeVertices:
         tree.SetBranchStatus("nGoodVtx*",1)
+        tree.SetBranchStatus("nTightVtx*", 1)
         tree.SetBranchStatus("nValidVtx*",1)
     tree.SetBranchStatus("run*",1)
     tree.SetBranchStatus("LS*",1)
@@ -220,19 +222,32 @@ if args.pccfile!="":
                 goodVertexCounts[LSKey]=[]
                 goodVertexCounts[LSKey].append([])
                 goodVertexCounts[LSKey].append({})
+
+                tightVertexCounts[LSKey]=[]
+                tightVertexCounts[LSKey].append([])
+                tightVertexCounts[LSKey].append({})
+
                 validVertexCounts[LSKey]=[]
                 validVertexCounts[LSKey].append([])
                 validVertexCounts[LSKey].append({})
+
                 for bx,counts in tree.BXNo:
                     goodVertexCounts[LSKey][1][bx]=[]
+                    tightVertexCounts[LSKey][1][bx]=[]
                     validVertexCounts[LSKey][1][bx]=[]
     
             for ibx,nGoodVtx in tree.nGoodVtx:
                 goodVertexCounts[LSKey][0].append([nGoodVtx,tree.BXNo[ibx]])
                 goodVertexCounts[LSKey][1][ibx].append([nGoodVtx,tree.BXNo[ibx]])
+
+            for ibx,nTightVtx in tree.nTightVtx:
+                tightVertexCounts[LSKey][0].append([nTightVtx, tree.BXNo[ibx]])
+                tightVertexCounts[LSKey][1][ibx].append([nTightVtx, tree.BXNo[ibx]])
+
             for ibx,nValidVtx in tree.nValidVtx:
                 validVertexCounts[LSKey][0].append([nValidVtx,tree.BXNo[ibx]])
                 validVertexCounts[LSKey][1][ibx].append([nValidVtx,tree.BXNo[ibx]])
+               
        
         #for ibx in tree.BXNo:
         #    print "BXNo", ibx[0], ibx[1]
@@ -340,6 +355,7 @@ nBXPLT = array.array( 'I', [ 0 ] )
 nCluster    = array.array( 'd', [ 0 ] )
 nClusterError    = array.array( 'd', [ 0 ] )
 nPCPerLayer = array.array( 'd', 5*[ 0 ] )
+nTrigger = array.array('d', [ 0 ] )
 
 HFLumi    = array.array( 'd', [ 0 ] )
 BCMFLumi  = array.array( 'd', [ 0 ] )
@@ -380,19 +396,38 @@ PC_xsec_layers  = array.array( 'd', 5*[ 0 ] )
 nPCPerBXid  = array.array( 'd', 3600*[ 0 ] )
 PCBXid        = array.array( 'I', 3600*[ 0 ] )
 
+
 goodVertices  = array.array( 'd', [ 0 ] )
+goodVertices_Lumi = array.array('d', [ 0 ] )
 goodVertices_xsec  = array.array( 'd', [ 0 ] )
 goodVertices_eff  = array.array( 'd', [ 0 ] )
 
+
 goodVertices_perBX  = array.array( 'd', 3600*[ 0 ] )
+goodVertices_Lumi_perBX = array.array( 'd', 3600*[ 0 ] )
 goodVertices_perBX_xsec  = array.array( 'd', 3600*[ 0 ] )
 goodVertices_perBX_eff  = array.array( 'd', 3600*[ 0 ] )
 
+
+tightVertices  = array.array( 'd', [ 0 ] )
+tightVertices_Lumi = array.array('d', [ 0 ] )
+tightVertices_xsec  = array.array( 'd', [ 0 ] )
+tightVertices_eff  = array.array( 'd', [ 0 ] )
+
+
+tightVertices_perBX  = array.array( 'd', 3600*[ 0 ] )
+tightVertices_Lumi_perBX = array.array( 'd', 3600*[ 0 ] )
+tightVertices_perBX_xsec  = array.array( 'd', 3600*[ 0 ] )
+tightVertices_perBX_eff  = array.array( 'd', 3600*[ 0 ] )
+
+
 validVertices  = array.array( 'd', [ 0 ] )
+validVertices_Lumi = array.array( 'd', [ 0 ] )
 validVertices_xsec  = array.array( 'd', [ 0 ] )
 validVertices_eff  = array.array( 'd', [ 0 ] )
 
 validVertices_perBX  = array.array( 'd', 3600*[ 0 ] )
+validVertices_Lumi_perBX = array.array( 'd', 3600*[ 0 ] )
 validVertices_perBX_xsec  = array.array( 'd', 3600*[ 0 ] )
 validVertices_perBX_eff  = array.array( 'd', 3600*[ 0 ] )
 
@@ -453,16 +488,29 @@ newtree.Branch("hasBrilData",hasBrilData,"hasBrilData/O")
 newtree.Branch("hasCMSData",hasCMSData,"hasCMSData/O")
 
 newtree.Branch("goodVertices",      goodVertices,     "goodVertices/D")
+newtree.Branch("goodVertices_Lumi", goodVertices_Lumi,    "goodVertices/D")
 newtree.Branch("goodVertices_xsec", goodVertices_xsec,"goodVertices_xsec/D")
 newtree.Branch("goodVertices_eff",  goodVertices_eff, "goodVertices_eff/D")
 newtree.Branch("goodVertices_perBX",      goodVertices_perBX,     "goodVertices_perBX[nBX]/D")
+newtree.Branch("goodVertices_Lumi_perBX", goodVertices_Lumi_perBX, "goodVertices_Lumi_perBX[nBX]/D")
 newtree.Branch("goodVertices_perBX_xsec", goodVertices_perBX_xsec,"goodVertices_perBX_xsec[nBX]/D")
 newtree.Branch("goodVertices_perBX_eff",  goodVertices_perBX_eff, "goodVertices_perBX_eff[nBX]/D")
 
+newtree.Branch("tightVertices",      tightVertices,     "tightVertices/D")
+newtree.Branch("tightVertices_Lumi", tightVertices_Lumi,    "tightVertices/D")
+newtree.Branch("tightVertices_xsec", tightVertices_xsec,"tightVertices_xsec/D")
+newtree.Branch("tightVertices_eff",  tightVertices_eff, "tightVertices_eff/D")
+newtree.Branch("tightVertices_perBX",      tightVertices_perBX,     "tightVertices_perBX[nBX]/D")
+newtree.Branch("tightVertices_Lumi_perBX", tightVertices_Lumi_perBX, "tightVertices_Lumi_perBX[nBX]/D")
+newtree.Branch("tightVertices_perBX_xsec", tightVertices_perBX_xsec,"tightVertices_perBX_xsec[nBX]/D")
+newtree.Branch("tightVertices_perBX_eff",  tightVertices_perBX_eff, "tightVertices_perBX_eff[nBX]/D")
+
 newtree.Branch("validVertices",      validVertices,     "validVertices/D")
+newtree.Branch("validVertices_Lumi", validVertices_Lumi, "validVertices_Lumi/D")
 newtree.Branch("validVertices_xsec", validVertices_xsec,"validVertices_xsec/D")
 newtree.Branch("validVertices_eff",  validVertices_eff, "validVertices_eff/D")
 newtree.Branch("validVertices_perBX",      validVertices_perBX,     "validVertices_perBX[nBX]/D")
+newtree.Branch("validVertices_Lumi_perBX", validVertices_Lumi_perBX, "validVertices_Lumi_perBX[nBX]/D")
 newtree.Branch("validVertices_perBX_xsec", validVertices_perBX_xsec,"validVertices_perBX_xsec[nBX]/D")
 newtree.Branch("validVertices_perBX_eff",  validVertices_perBX_eff, "validVertices_perBX_eff[nBX]/D")
 
@@ -610,6 +658,7 @@ for key in LSKeys:
             count=0
             if args.includeVertices:
                 goodVertices[0]=AverageWithWeight(goodVertexCounts[key][0])
+                tightVertices[0]=AverageWithWeight(tightVertexCounts[key][0])
                 validVertices[0]=AverageWithWeight(validVertexCounts[key][0])
                 bxids=goodVertexCounts[key][1].keys()
                 bxids.sort()
@@ -617,6 +666,7 @@ for key in LSKeys:
                 ibx=0
                 for bxid in bxids:
                     goodVertices_perBX[ibx]=AverageWithWeight(goodVertexCounts[key][1][bxid])
+                    tightVertices_perBX[ibx]=AverageWithWeight(tightVertexCounts[key][1][bxid])
                     validVertices_perBX[ibx]=AverageWithWeight(validVertexCounts[key][1][bxid])
                     ibx=ibx+1
 
@@ -666,15 +716,25 @@ for key in LSKeys:
             totalOrbitsPerLS=math.pow(2,18)*nActiveBX[0]
             PC_xsec[0]=nCluster[0]/BestLumi_integrated[0]*totalOrbitsPerLS
             if args.includeVertices:
+                goodVertices_Lumi[0]=goodVertices[0]*totalOrbitsPerLS/(1e6)
                 goodVertices_xsec[0]=goodVertices[0]/BestLumi_integrated[0]*totalOrbitsPerLS
                 goodVertices_eff[0]=goodVertices_xsec[0]/xsec_ub
+                tightVertices_Lumi[0]=tightVertices[0]*totalOrbitsPerLS/(1e6)
+                tightVertices_xsec[0]=tightVertices[0]/BestLumi_integrated[0]*totalOrbitsPerLS
+                tightVertices_eff[0]=tightVertices_xsec[0]/xsec_ub
+                validVertices_Lumi[0]=validVertices[0]*totalOrbitsPerLS
                 validVertices_xsec[0]=validVertices[0]/BestLumi_integrated[0]*totalOrbitsPerLS
                 validVertices_eff[0]=validVertices_xsec[0]/xsec_ub
                 ibx=0
                 for bxid in bxids:
                     # FIXME I should really use the lumi for this bx and not multiply by number of bxs
+                    goodVertices_Lumi_perBX[ibx]=goodVertices_Lumi_perBX[ibx]*totalOrbitsPerLS/(1e6)
                     goodVertices_perBX_xsec[ibx]=goodVertices_perBX[ibx]/BestLumi_integrated[0]*math.pow(2,18)*nActiveBX[0]
                     goodVertices_perBX_eff[ibx]=goodVertices_perBX_xsec[ibx]/xsec_ub
+                    tightVertices_Lumi_perBX[ibx]=tightVertices_Lumi_perBX[ibx]*totalOrbitsPerLS/(1e6)
+                    tightVertices_perBX_xsec[ibx]=tightVertices_perBX[ibx]/BestLumi_integrated[0]*math.pow(2,18)*nActiveBX[0]
+                    tightVertices_perBX_eff[ibx]=tightVertices_perBX_xsec[ibx]/xsec_ub
+                    validVertices_Lumi_perBX[ibx]=validVertices_perBX[ibx]*totalOrbitsPerLS
                     validVertices_perBX_xsec[ibx]=validVertices_perBX[ibx]/BestLumi_integrated[0]*math.pow(2,18)*nActiveBX[0]
                     validVertices_perBX_eff[ibx]=validVertices_perBX_xsec[ibx]/xsec_ub
                     ibx=ibx+1

@@ -29,12 +29,9 @@ if args.csv!="":
     for line in lines:
         items = line.split(",")
         fill = int(items[0])
-        runnum = int(items[1])
-        minLS = int(items[2])
-        maxLS = int(items[3])
 
-        pcc_dict[(fill, runnum)]=float(items[4])
-        print float(items[4])
+        pcc_dict[fill]=float(items[1])
+        print float(items[1])
    
 print pcc_dict
 rebinLS=1
@@ -119,7 +116,7 @@ tree.SetBranchStatus("run",1)
 tree.SetBranchStatus("LS",1)
 tree.SetBranchStatus("hasBrilData",1)
 tree.SetBranchStatus("hasCMSData",1)
-tree.SetBranchStatus("nBX",1)
+tree.SetBranchStatus("nActiveBX",1)
 
 onlyBril=[]
 onlyCMS=[]
@@ -163,6 +160,7 @@ PCClayers={}
 eventRate={}
 layerColors=[616,1,632,600,416]
 histPU={}
+nActiveBX={}
 
 bestHF={}
 bestBCM1f={}
@@ -174,20 +172,25 @@ for run in runLSMax:
     runLSMax[run]=bins*rebinLS
     nBins[run]=bins
 
-
 #yLabelPix="PCC/BestLumi*2^18*N_{BX}"
 yLabelPix="Pixel Cluster xsec (ub)"
 
 for ient in range(nentries):
     tree.GetEntry(ient)
-    pcc_corr=1
+
+    if not nActiveBX.has_key(tree.run):
+        nActiveBX[tree.run] = tree.nActiveBX
+
+    pcc_corr=0.8624
     if args.docorr:
-        if pcc_dict.has_key((tree.fill, tree.run)):
-            pcc_corr=pcc_dict[(tree.fill, tree.run)]
+        if pcc_dict.has_key(tree.fill):
+            pcc_corr=pcc_dict[tree.fill]
     if tree.hasCMSData:
+	
         if not eventRate.has_key(tree.run):
             eventRate[tree.run]=ROOT.TH1F(str(tree.run)+"_eventrate",";Luminosity Section  ;Event Rate (Hz)",nBins[tree.run],0,runLSMax[tree.run])
         eventRate[tree.run].Fill(tree.LS,tree.eventRate)
+	
         if tree.nCluster>0:
             for layer in range(0,5):
                 layerkey=str(tree.run)+"_PCClayer"+str(layer+1)
@@ -329,7 +332,30 @@ for run in runsToCheck:
         labelRate=ROOT.TText(0,eventRate[run].GetMaximum()*0.4,"      Average Rate in Run="+str(run)+" = "+"{0:.1f}".format(meanRate)+" Hz")
         labelRate.SetTextSize(.1)
         labelRate.Draw("same")
+	
         pad2.Update()
+
+
+#	pad2.cd(3)
+#	#add my code right here.
+#       histpix_HF[run].SetMaximum(pixhistmax)
+	#set the maximum
+#        label3=ROOT.TText(0,histpix_HF[run].GetMaximum()*0.88,"   Pixel Cluster Cross Section HF - Run="+str(run))
+#        label3.SetTextSize(.1)
+#        histpix_HF[run].Draw("hist")
+#        label3.Draw("same")
+#        lineB0.Draw("same")
+#        lineB3p8.Draw("same")
+#        legPixXSec.Draw("same")
+#        histpix_BCMF[run].SetMaximum(pixhistmax)
+#        label4=ROOT.TText(0,histpix_BCMF[run].GetMaximum()*0.88,"   Pixel Cluster Cross Section BCM1f - Run="+str(run))
+#        label4.SetTextSize(.1)
+#        histpix_BCMF[run].Draw("hist")
+#        label4.Draw("same")
+#        lineB0.Draw("same")
+#        lineB3p8.Draw("same")
+#        legPixXSec.Draw("same")
+#	pad2.Update()
 
         #pad2.cd(3)
         #histpix_HF[run].SetMaximum(pixhistmax)
@@ -463,6 +489,7 @@ for run in runsToCheck:
         leg2.AddEntry(hfOverPLT,   "HF/PLT               =   "+"{:10.4f}".format(mean5)+" #pm "+"{:10.4f}".format(meanError5),"l")
         leg2.AddEntry(bcmfOverPLT, "BCM1F/PLT        =   "+"{:10.4f}".format(mean6)+" #pm "+"{:10.4f}".format(meanError6),"l")
         BestOPCLumi.Draw("hist")
+	#take these histograms
         HFOPCLumi.Draw("histsame")
         BCM1FOPCLumi.Draw("histsame")
         PLTOPCLumi.Draw("histsame")
@@ -472,13 +499,102 @@ for run in runsToCheck:
         padlumis.Update()
 
         if run in bothSets:
-            padlumis.cd(3)
+            pad2.cd(3)
             histPU[run].Draw("hist")
-            padlumis.Update()
+            pad2.Update()
+#move this to the right
+        
+        #dictionary, linearity plots
+	linPlots = {}
+        #TProfile (const char *name, const char *title, Int_t nbinsx, const Double_t *xbins, Option_t *option="")
+	linPlots["HFoverPCC"]=ROOT.TProfile("",";PCC Average SBIL Hz/ub  ;Online/PCC",50,0,8,0,2)
+        linPlots["HFoverPCC"].SetMaximum(2.0)
+        iGraph=0
+	for iBin in range(HFOPCLumi.GetNbinsX()):   #divide lumi by number of active bunches in fill
+            lumi = histPCLumiB3p8[run].GetBinContent(iBin)/nActiveBX[run]
+            ratio = HFOPCLumi.GetBinContent(iBin)
+            if(ratio>0.1 and ratio<5 and lumi>0.0): #x_val = pcc inst. lumi (see histogram)
+                linPlots["HFoverPCC"].Fill(lumi,ratio,iGraph)
+		print str(lumi)+"	"+str(ratio)
+                iGraph = iGraph+1
+        #add titles and stuff        
+	padlumis.cd(3)
+        linPlots["HFoverPCC"].SetLineColor(ROOT.kRed)
+	linPlots["HFoverPCC"].SetLineWidth(50)
+        ReStyleHistogram(linPlots["HFoverPCC"],3)
+	linPlots["HFoverPCC"].Draw("PE")
+        
+        fun_hfoverpcc=ROOT.TF1("fun_hfoverpcc", "[0]+[1]*x", 0, 20)
+        linPlots["HFoverPCC"].Fit(fun_hfoverpcc, "N")
+        hf_p0 = fun_hfoverpcc.GetParameter(0)
+        hf_e0 = fun_hfoverpcc.GetParError(0)
+        hf_p1 = fun_hfoverpcc.GetParameter(1)
+        hf_e1 = fun_hfoverpcc.GetParError(1)
+        
+	padlumis.Update()
+        
+        linPlots["PLToverPCC"]=ROOT.TProfile("",";Hz/ub  ;Online/PCC",50,0,8,0,2)
+        linPlots["PLToverPCC"].SetMaximum(2.0)
+        iGraph=0
+        for iBin in range(HFOPCLumi.GetNbinsX()):   
+            lumi = histPCLumiB3p8[run].GetBinContent(iBin)/nActiveBX[run]
+            ratio = PLTOPCLumi.GetBinContent(iBin)
+            if(ratio>0.1 and ratio<5 and lumi>0.0): 
+                linPlots["PLToverPCC"].Fill(lumi,ratio,iGraph)
+                iGraph = iGraph+1        
+        padlumis.cd(3)
+	linPlots["PLToverPCC"].SetLineColor(ROOT.kBlue)
+	linPlots["PLToverPCC"].SetLineWidth(50)
+        ReStyleHistogram(linPlots["PLToverPCC"],3)
+        linPlots["PLToverPCC"].Draw("pe same")
+        padlumis.Update()
+
+        fun_pltoverpcc=ROOT.TF1("fun_pltoverpcc", "[0]+[1]*x", 0, 20)
+        linPlots["PLToverPCC"].Fit(fun_pltoverpcc, "N")
+        plt_p0 = fun_pltoverpcc.GetParameter(0)
+        plt_e0 = fun_pltoverpcc.GetParError(0)
+        plt_p1 = fun_pltoverpcc.GetParameter(1)
+        plt_e1 = fun_pltoverpcc.GetParError(1)
+         
+        linPlots["BCM1FoverPCC"]=ROOT.TProfile("",";Hz/ub  ;Online/PCC",50,0,8,0,2)
+        linPlots["BCM1FoverPCC"].SetMaximum(2.0)
+        iGraph=0
+        for iBin in range(HFOPCLumi.GetNbinsX()):   
+            lumi = histPCLumiB3p8[run].GetBinContent(iBin)/nActiveBX[run]
+            ratio = BCM1FOPCLumi.GetBinContent(iBin)
+            if(ratio>0.1 and ratio<5 and lumi>0.0): 
+                linPlots["BCM1FoverPCC"].Fill(lumi,ratio,iGraph)
+                iGraph = iGraph+1       
+        padlumis.cd(3)
+	linPlots["BCM1FoverPCC"].SetLineColor(ROOT.kGreen)
+	linPlots["BCM1FoverPCC"].SetLineWidth(50)
+	ReStyleHistogram(linPlots["BCM1FoverPCC"],3)
+        linPlots["BCM1FoverPCC"].Draw("pe same")
+        padlumis.Update()
+        fun_bcm1foverpcc=ROOT.TF1("fun_bcm1foverpcc", "[0]+[1]*x", 0, 20)
+        linPlots["BCM1FoverPCC"].Fit(fun_bcm1foverpcc, "N")
+        bcm1f_p0 = fun_bcm1foverpcc.GetParameter(0)
+        bcm1f_e0 = fun_bcm1foverpcc.GetParError(0)
+        bcm1f_p1 = fun_bcm1foverpcc.GetParameter(1)
+        bcm1f_e1 = fun_bcm1foverpcc.GetParError(1)
+
+        leg6=ROOT.TLegend(0.1,0.7,0.5,0.9)
+        print mean1,meanError1
+#       mean4,meanError4=GetYAverage(PLTOPCLumi,True)
+	ratio_mean1, ratio_meanError1=GetYAverage(linPlots["HFoverPCC"],True)
+	ratio_mean2, ratio_meanError2=GetYAverage(linPlots["PLToverPCC"],True)
+	ratio_mean3, ratio_meanError3=GetYAverage(linPlots["BCM1FoverPCC"],True)
+        leg6.AddEntry(linPlots["HFoverPCC"],   "HF/PCC    Linearity Fit:  "+"p0="+"{:10.4f}".format(hf_p0)+"#pm"+"{:4.4f}".format(hf_e0)+", p1="+"{:10.4f}".format(hf_p1)+"#pm"+"{:4.4f}".format(hf_e1),"l")
+        leg6.AddEntry(linPlots["PLToverPCC"],  "PLT/PCC   Linearity Fit:  "+"p0="+"{:10.4f}".format(plt_p0)+"#pm"+"{:4.4f}".format(plt_e0)+", p1="+"{:10.4f}".format(plt_p1)+"#pm"+"{:4.4f}".format(plt_e1),"l")
+        leg6.AddEntry(linPlots["BCM1FoverPCC"],"BCM1F/PCC Linearity Fit:  "+"p0="+"{:10.4f}".format(bcm1f_p0)+"#pm"+"{:4.4f}".format(bcm1f_e0)+", p1="+"{:10.4f}".format(bcm1f_p1)+"#pm"+"{:4.4f}".format(bcm1f_e1), "l")
+        leg6.SetFillStyle(0)
+        leg6.SetBorderSize(0)
+	leg6.Draw("same")
+	padlumis.Update()	
 
     tcan.Update()
     tcan.SaveAs(args.outDir+str(run)+".png")
-
+	
     #raw_input()
     padlumis.Clear()
     pad2.Clear()
