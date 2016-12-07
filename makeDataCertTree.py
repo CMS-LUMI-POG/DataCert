@@ -170,6 +170,7 @@ tightVertexCounts={}
 validVertexCounts={}
 PCCsPerLS={}
 eventRates={}
+timeStamps={}
 nBXs={}
 lumiEstimate={}
 # key is bx,LS and LS
@@ -198,6 +199,7 @@ if args.pccfile!="":
     tree.SetBranchStatus("run*",1)
     tree.SetBranchStatus("LS*",1)
     tree.SetBranchStatus("event*",1)
+    tree.SetBranchStatus("timeStamp_begin*", 1)
     tree.SetBranchStatus("nPixelClusters*",1)
     tree.SetBranchStatus("layer*",1)
     tree.SetBranchStatus("BXNo",1)
@@ -216,6 +218,7 @@ if args.pccfile!="":
         
         LSKey=(tree.run,tree.LS)
         eventRates[LSKey]=tree.eventCounter/23.31
+        timeStamps[LSKey]=tree.timeStamp_begin
         nBXs[LSKey]=len(tree.BXNo)
         if args.includeVertices:
             if LSKey not in goodVertexCounts:
@@ -345,6 +348,7 @@ newtree=ROOT.TTree("certtree","validationtree")
 fill= array.array( 'I', [ 0 ] )
 run = array.array( 'I', [ 0 ] )
 LS  = array.array( 'I', [ 0 ] )
+timeStamp = array.array( 'i', [ 0 ] )
 nBX = array.array( 'I', [ 0 ] )
 eventRate  = array.array( 'd', [ 0 ] )
 nActiveBX = array.array( 'I', [ 0 ] )
@@ -436,6 +440,7 @@ validVertices_perBX_eff  = array.array( 'd', 3600*[ 0 ] )
 newtree.Branch("fill",fill,"fill/I")
 newtree.Branch("run",run,"run/I")
 newtree.Branch("LS",LS,"LS/I")
+newtree.Branch("timeStamp", timeStamp, "timeStamp/i")
 newtree.Branch("eventRate",eventRate,"eventRate/D")
 newtree.Branch("nActiveBX",nActiveBX,"nActiveBX/I")
 newtree.Branch("nBX",nBX,"nBX/I")
@@ -542,7 +547,6 @@ for key in LSKeys:
             nActiveBX[0]=int(runInfo["nActiveBXBEAMINFO"][run[0]])
         else:
             print "no",run[0],"among keys"
-        
 
     hasBrilData[0]=False
     hasCMSData[0]=False
@@ -654,7 +658,8 @@ for key in LSKeys:
             hasCMSData[0]=True
             nBX[0]=nBXs[key]
             eventRate[0]=eventRates[key]
-
+            timeStamp[0]=timeStamps[key]
+            
             count=0
             if args.includeVertices:
                 goodVertices[0]=AverageWithWeight(goodVertexCounts[key][0])
