@@ -547,8 +547,6 @@ for key in LSKeys:
             nActiveBX[0]=int(runInfo["nActiveBXBEAMINFO"][run[0]])
         else:
             print "no",run[0],"among keys"
-    if run[0]==282663:
-        nActiveBX[0]=589 
 
     hasBrilData[0]=False
     hasCMSData[0]=False
