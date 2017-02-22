@@ -353,6 +353,8 @@ nBX = array.array( 'I', [ 0 ] )
 eventRate  = array.array( 'd', [ 0 ] )
 nActiveBX = array.array( 'I', [ 0 ] )
 nBXHF = array.array( 'I', [ 0 ] )
+nBXHFET = array.array( 'I', [ 0 ] )
+nBXPCC = array.array( 'I', [ 0 ] )
 nBXBCMF = array.array( 'I', [ 0 ] )
 nBXPLT = array.array( 'I', [ 0 ] )
 
@@ -362,6 +364,8 @@ nPCPerLayer = array.array( 'd', 5*[ 0 ] )
 nTrigger = array.array('d', [ 0 ] )
 
 HFLumi    = array.array( 'd', [ 0 ] )
+HFETLumi    = array.array( 'd', [ 0 ] )
+PCCLumi    = array.array( 'd', [ 0 ] )
 BCMFLumi  = array.array( 'd', [ 0 ] )
 PLTLumi   = array.array( 'd', [ 0 ] )
 BestLumi  = array.array( 'd', [ 0 ] )
@@ -369,27 +373,22 @@ BestLumi_PU  = array.array( 'd', [ 0 ] )
 PC_PU  = array.array( 'd', [ 0 ] )
 
 HFLumi_perBX = array.array( 'd', 3600*[ -1 ] )
+HFETLumi_perBX = array.array( 'd', 3600*[ -1 ] )
+PCCLumi_perBX = array.array( 'd', 3600*[ -1 ] )
 BCMFLumi_perBX = array.array( 'd', 3600*[ -1 ] )
 PLTLumi_perBX = array.array('d', 3600*[ -1 ] )
 
 HFBXid = array.array('I', 3600*[ 0 ] )
+HFETBXid = array.array('I', 3600*[ 0 ] )
+PCCBXid = array.array('I', 3600*[ 0 ] )
 BCMFBXid = array.array('I', 3600*[ 0 ] )
 PLTBXid = array.array('I', 3600*[ 0 ] )
-
-HFLumi_integrated    = array.array( 'd', [ 0 ] )
-BCMFLumi_integrated  = array.array( 'd', [ 0 ] )
-PLTLumi_integrated   = array.array( 'd', [ 0 ] )
-BestLumi_integrated  = array.array( 'd', [ 0 ] )
 
 hasBrilData = array.array('b', [0])
 hasCMSData  = array.array('b', [0])
 
 PC_lumi_B0      = array.array( 'd', [ 0 ] )
 PC_lumi_B3p8    = array.array( 'd', [ 0 ] )
-PC_lumi_integrated_B0      = array.array( 'd', [ 0 ] )
-PC_lumi_integrated_B3p8    = array.array( 'd', [ 0 ] )
-PC_lumi_integrated_error_B0      = array.array( 'd', [ 0 ] )
-PC_lumi_integrated_error_B3p8    = array.array( 'd', [ 0 ] )
 
 PC_lumi_B0_perBX  = array.array('d', 3600*[ 0 ])
 PC_lumi_B3p8_perBX = array.array('d', 3600*[ 0 ])
@@ -402,38 +401,13 @@ PCBXid        = array.array( 'I', 3600*[ 0 ] )
 
 
 goodVertices  = array.array( 'd', [ 0 ] )
-goodVertices_Lumi = array.array('d', [ 0 ] )
-goodVertices_xsec  = array.array( 'd', [ 0 ] )
-goodVertices_eff  = array.array( 'd', [ 0 ] )
-
-
 goodVertices_perBX  = array.array( 'd', 3600*[ 0 ] )
-goodVertices_Lumi_perBX = array.array( 'd', 3600*[ 0 ] )
-goodVertices_perBX_xsec  = array.array( 'd', 3600*[ 0 ] )
-goodVertices_perBX_eff  = array.array( 'd', 3600*[ 0 ] )
-
 
 tightVertices  = array.array( 'd', [ 0 ] )
-tightVertices_Lumi = array.array('d', [ 0 ] )
-tightVertices_xsec  = array.array( 'd', [ 0 ] )
-tightVertices_eff  = array.array( 'd', [ 0 ] )
-
-
 tightVertices_perBX  = array.array( 'd', 3600*[ 0 ] )
-tightVertices_Lumi_perBX = array.array( 'd', 3600*[ 0 ] )
-tightVertices_perBX_xsec  = array.array( 'd', 3600*[ 0 ] )
-tightVertices_perBX_eff  = array.array( 'd', 3600*[ 0 ] )
-
 
 validVertices  = array.array( 'd', [ 0 ] )
-validVertices_Lumi = array.array( 'd', [ 0 ] )
-validVertices_xsec  = array.array( 'd', [ 0 ] )
-validVertices_eff  = array.array( 'd', [ 0 ] )
-
 validVertices_perBX  = array.array( 'd', 3600*[ 0 ] )
-validVertices_Lumi_perBX = array.array( 'd', 3600*[ 0 ] )
-validVertices_perBX_xsec  = array.array( 'd', 3600*[ 0 ] )
-validVertices_perBX_eff  = array.array( 'd', 3600*[ 0 ] )
 
 
 
@@ -445,6 +419,8 @@ newtree.Branch("eventRate",eventRate,"eventRate/D")
 newtree.Branch("nActiveBX",nActiveBX,"nActiveBX/I")
 newtree.Branch("nBX",nBX,"nBX/I")
 newtree.Branch("nBXHF", nBXHF, "nBXHF/I")
+newtree.Branch("nBXHFET", nBXHFET, "nBXHFET/I")
+newtree.Branch("nBXPCC", nBXPCC, "nBXPCC/I")
 newtree.Branch("nBXBCMF", nBXBCMF, "nBXBCMF/I")
 newtree.Branch("nBXPLT", nBXPLT, "nBXPLT/I")
 
@@ -454,10 +430,6 @@ newtree.Branch("nPCPerLayer",nPCPerLayer,"nPCPerLayer[5]/D")
 
 newtree.Branch("PC_lumi_B0",PC_lumi_B0,"PC_lumi_B0/D")
 newtree.Branch("PC_lumi_B3p8",PC_lumi_B3p8,"PC_lumi_B3p8/D")
-newtree.Branch("PC_lumi_integrated_B0",PC_lumi_integrated_B0,"PC_lumi_integrated_B0/D")
-newtree.Branch("PC_lumi_integrated_B3p8",PC_lumi_integrated_B3p8,"PC_lumi_integrated_B3p8/D")
-newtree.Branch("PC_lumi_integrated_error_B0",PC_lumi_integrated_error_B0,"PC_lumi_integrated_error_B0/D")
-newtree.Branch("PC_lumi_integrated_error_B3p8",PC_lumi_integrated_error_B3p8,"PC_lumi_integrated_error_B3p8/D")
 
 newtree.Branch("PC_lumi_B0_perBX", PC_lumi_B0_perBX, "PC_lumi_B0_perBX[nBX]/D")
 newtree.Branch("PC_lumi_B3p8_perBX", PC_lumi_B3p8_perBX, "PC_lumi_B3p8_perBX[nBX]/D")
@@ -470,21 +442,22 @@ newtree.Branch("nPCPerBXid",nPCPerBXid,"nPCPerBXid[nBX]/D")
 
 newtree.Branch("BestLumi",BestLumi,"BestLumi/D")
 newtree.Branch("HFLumi",HFLumi,"HFLumi/D")
+newtree.Branch("HFETLumi",HFETLumi,"HFETLumi/D")
+newtree.Branch("PCCLumi",PCCLumi,"PCCLumi/D")
 newtree.Branch("BCMFLumi",BCMFLumi,"BCMFLumi/D")
 newtree.Branch("PLTLumi",PLTLumi,"PLTLumi/D")
 
 newtree.Branch("HFLumi_perBX", HFLumi_perBX, "HFLumi_perBX[nBXHF]/D")
+newtree.Branch("HFETLumi_perBX", HFETLumi_perBX, "HFETLumi_perBX[nBXHFET]/D")
+newtree.Branch("PCCLumi_perBX", PCCLumi_perBX, "PCCLumi_perBX[nBXPCC]/D")
 newtree.Branch("BCMFLumi_perBX", BCMFLumi_perBX, "BCMFLumi_perBX[nBXBCMF]/D")
 newtree.Branch("PLTLumi_perBX", PLTLumi_perBX, "PLTLumi_perBX[nBXPLT]/D")
 
 newtree.Branch("HFBXid", HFBXid, "HFBXid[nBXHF]/I")
+newtree.Branch("HFETBXid", HFETBXid, "HFETBXid[nBXHFET]/I")
+newtree.Branch("PCCBXid", PCCBXid, "PCCBXid[nBXPCC]/I")
 newtree.Branch("BCMFBXid", BCMFBXid, "BCMFBXid[nBXBCMF]/I")
 newtree.Branch("PLTBXid", PLTBXid, "PLTBXid[nBXPLT]/I")
-
-newtree.Branch("BestLumi_integrated",BestLumi_integrated,"BestLumi_integrated/D")
-newtree.Branch("HFLumi_integrated",HFLumi_integrated,"HFLumi_integrated/D")
-newtree.Branch("BCMFLumi_integrated",BCMFLumi_integrated,"BCMFLumi_integrated/D")
-newtree.Branch("PLTLumi_integrated",PLTLumi_integrated,"PLTLumi_integrated/D")
 
 newtree.Branch("BestLumi_PU",BestLumi_PU,"BestLumi_PU/D")
 newtree.Branch("PC_PU",PC_PU,"PC_PU/D")
@@ -493,31 +466,13 @@ newtree.Branch("hasBrilData",hasBrilData,"hasBrilData/O")
 newtree.Branch("hasCMSData",hasCMSData,"hasCMSData/O")
 
 newtree.Branch("goodVertices",      goodVertices,     "goodVertices/D")
-newtree.Branch("goodVertices_Lumi", goodVertices_Lumi,    "goodVertices/D")
-newtree.Branch("goodVertices_xsec", goodVertices_xsec,"goodVertices_xsec/D")
-newtree.Branch("goodVertices_eff",  goodVertices_eff, "goodVertices_eff/D")
 newtree.Branch("goodVertices_perBX",      goodVertices_perBX,     "goodVertices_perBX[nBX]/D")
-newtree.Branch("goodVertices_Lumi_perBX", goodVertices_Lumi_perBX, "goodVertices_Lumi_perBX[nBX]/D")
-newtree.Branch("goodVertices_perBX_xsec", goodVertices_perBX_xsec,"goodVertices_perBX_xsec[nBX]/D")
-newtree.Branch("goodVertices_perBX_eff",  goodVertices_perBX_eff, "goodVertices_perBX_eff[nBX]/D")
 
 newtree.Branch("tightVertices",      tightVertices,     "tightVertices/D")
-newtree.Branch("tightVertices_Lumi", tightVertices_Lumi,    "tightVertices/D")
-newtree.Branch("tightVertices_xsec", tightVertices_xsec,"tightVertices_xsec/D")
-newtree.Branch("tightVertices_eff",  tightVertices_eff, "tightVertices_eff/D")
 newtree.Branch("tightVertices_perBX",      tightVertices_perBX,     "tightVertices_perBX[nBX]/D")
-newtree.Branch("tightVertices_Lumi_perBX", tightVertices_Lumi_perBX, "tightVertices_Lumi_perBX[nBX]/D")
-newtree.Branch("tightVertices_perBX_xsec", tightVertices_perBX_xsec,"tightVertices_perBX_xsec[nBX]/D")
-newtree.Branch("tightVertices_perBX_eff",  tightVertices_perBX_eff, "tightVertices_perBX_eff[nBX]/D")
 
 newtree.Branch("validVertices",      validVertices,     "validVertices/D")
-newtree.Branch("validVertices_Lumi", validVertices_Lumi, "validVertices_Lumi/D")
-newtree.Branch("validVertices_xsec", validVertices_xsec,"validVertices_xsec/D")
-newtree.Branch("validVertices_eff",  validVertices_eff, "validVertices_eff/D")
 newtree.Branch("validVertices_perBX",      validVertices_perBX,     "validVertices_perBX[nBX]/D")
-newtree.Branch("validVertices_Lumi_perBX", validVertices_Lumi_perBX, "validVertices_Lumi_perBX[nBX]/D")
-newtree.Branch("validVertices_perBX_xsec", validVertices_perBX_xsec,"validVertices_perBX_xsec[nBX]/D")
-newtree.Branch("validVertices_perBX_eff",  validVertices_perBX_eff, "validVertices_perBX_eff[nBX]/D")
 
 
 PC_calib_xsec={}
@@ -552,33 +507,22 @@ for key in LSKeys:
     hasCMSData[0]=False
     
     HFLumi[0]=-1
+    HFETLumi[0]=-1
+    PCCLumi[0]=-1
     BestLumi[0]=-1
     PLTLumi[0] =-1
     BCMFLumi[0]=-1
     
-    HFLumi_integrated[0]=-1
-    BestLumi_integrated[0]=-1
-    PLTLumi_integrated[0] =-1
-    BCMFLumi_integrated[0]=-1
-        
     BestLumi_PU[0]=-1
     PC_PU[0]=-1
     PC_xsec[0]=-1
 
     PC_lumi_B0[0]=-1
     PC_lumi_B3p8[0]=-1
-    PC_lumi_integrated_B0[0]=-1
-    PC_lumi_integrated_B3p8[0]=-1
-    PC_lumi_integrated_error_B0[0]=-1
-    PC_lumi_integrated_error_B3p8[0]=-1
 
     goodVertices[0]=-1
-    goodVertices_xsec[0]=-1
-    goodVertices_eff[0]=-1
-
+    tightVertices[0]=-1
     validVertices[0]=-1
-    validVertices_xsec[0]=-1
-    validVertices_eff[0]=-1
 
     for layer in range(0,5):
         PC_xsec_layers[layer]=-1
@@ -589,29 +533,28 @@ for key in LSKeys:
             hasBrilData[0]=True
             fill[0]=int(onlineLumi[key]['fill'])
             if onlineLumi[key].has_key('best'):
-                BestLumi_integrated[0]=float(onlineLumi[key][onlineLumi[key]['best']])
-                BestLumi[0]=BestLumi_integrated[0]
+                BestLumi[0]=float(onlineLumi[key][onlineLumi[key]['best']])
             else:
-                BestLumi_integrated[0]=float(onlineLumi[key]['PLTZERO'])
-                BestLumi[0]=BestLumi_integrated[0]
+                BestLumi[0]=float(onlineLumi[key]['PLTZERO'])
             if onlineLumi[key].has_key('PU_best'):
                 BestLumi_PU[0]=float(onlineLumi[key]['PU_best'])
                 
             if BestLumi[0]>0:
                 BestLumi[0]=BestLumi[0]/t_LS
-            if onlineLumi[key].has_key('HFOC'):
-                HFLumi_integrated[0]=float(onlineLumi[key]['HFOC'])
-                HFLumi[0]=HFLumi_integrated[0]
-                if HFLumi[0]>0:
-                    HFLumi[0]=HFLumi[0]/t_LS
+            if onlineLumi[key].has_key('HFET'):
+                HFETLumi[0]=float(onlineLumi[key]['HFET'])
+                if HFETLumi[0]>0:
+                    HFETLumi[0]=HFETLumi[0]/t_LS
+            if onlineLumi[key].has_key('PCC'):
+                PCCLumi[0]=float(onlineLumi[key]['PCC'])
+                if PCCLumi[0]>0:
+                    PCCLumi[0]=PCCLumi[0]/t_LS
             if onlineLumi[key].has_key('PLTZERO'):
-                PLTLumi_integrated[0]=float(onlineLumi[key]['PLTZERO'])
-                PLTLumi[0]=PLTLumi_integrated[0]
+                PLTLumi[0]=float(onlineLumi[key]['PLTZERO'])
                 if PLTLumi[0]>0:
                     PLTLumi[0]=PLTLumi[0]/t_LS
             if onlineLumi[key].has_key('BCM1F'):
-                BCMFLumi_integrated[0]=float(onlineLumi[key]['BCM1F'])
-                BCMFLumi[0]=BCMFLumi_integrated[0]
+                BCMFLumi[0]=float(onlineLumi[key]['BCM1F'])
                 if BCMFLumi[0]>0:
                     BCMFLumi[0]=BCMFLumi[0]/t_LS
 
@@ -625,6 +568,30 @@ for key in LSKeys:
                     HFBXid[idxHF] = int(HFbxkey)
                     HFLumi_perBX[idxHF] = float(onlineLumi[key]['HFOC_BX'][HFbxkey])/t_LS
                     idxHF = idxHF+1
+            
+
+            if onlineLumi[key].has_key('HFET_BX'):
+                nBXHFET[0] = len(onlineLumi[key]['HFET_BX'])
+                idxHFET=0
+                HFETbxkeys = onlineLumi[key]['HFET_BX'].keys()
+                HFETbxkeys.sort()
+                #print "HFET length", len(HFETbxkeys)
+                for HFETbxkey in HFETbxkeys :
+                    HFETBXid[idxHFET] = int(HFETbxkey)
+                    HFETLumi_perBX[idxHFET] = float(onlineLumi[key]['HFET_BX'][HFETbxkey])/t_LS
+                    idxHFET = idxHFET+1
+            
+
+            if onlineLumi[key].has_key('PCC_BX'):
+                nBXPCC[0] = len(onlineLumi[key]['PCC_BX'])
+                idxPCC=0
+                PCCbxkeys = onlineLumi[key]['PCC_BX'].keys()
+                PCCbxkeys.sort()
+                #print "PCC length", len(PCCbxkeys)
+                for PCCbxkey in PCCbxkeys :
+                    PCCBXid[idxPCC] = int(PCCbxkey)
+                    PCCLumi_perBX[idxPCC] = float(onlineLumi[key]['PCC_BX'][PCCbxkey])/t_LS
+                    idxPCC = idxPCC+1
             
 
             if onlineLumi[key].has_key('PLTZERO_BX'):
@@ -708,10 +675,7 @@ for key in LSKeys:
             
             PC_lumi_B0[0]=totalPC/PC_calib_xsec["B0_"+args.collisionType]/t_LS
             PC_lumi_B3p8[0]=totalPC/PC_calib_xsec["B3p8_"+args.collisionType]/t_LS
-            PC_lumi_integrated_B0[0]=totalPC/PC_calib_xsec["B0_"+args.collisionType]
-            PC_lumi_integrated_B3p8[0]=totalPC/PC_calib_xsec["B3p8_"+args.collisionType]
-            PC_lumi_integrated_error_B0[0]=totalPCError/PC_calib_xsec["B0_"+args.collisionType]
-            PC_lumi_integrated_error_B3p8[0]=totalPCError/PC_calib_xsec["B3p8_"+args.collisionType]
+            #PC_lumi_integrated_error_B0[0]=totalPCError/PC_calib_xsec["B0_"+args.collisionType]
             
         except:
             print "Failed in cmskey",key
@@ -719,33 +683,10 @@ for key in LSKeys:
     if hasCMSData[0] and hasBrilData[0]: 
         try:
             totalOrbitsPerLS=math.pow(2,18)*nActiveBX[0]
-            PC_xsec[0]=nCluster[0]/BestLumi_integrated[0]*totalOrbitsPerLS
-            if args.includeVertices:
-                goodVertices_Lumi[0]=goodVertices[0]*totalOrbitsPerLS/(1e6)
-                goodVertices_xsec[0]=goodVertices[0]/BestLumi_integrated[0]*totalOrbitsPerLS
-                goodVertices_eff[0]=goodVertices_xsec[0]/xsec_ub
-                tightVertices_Lumi[0]=tightVertices[0]*totalOrbitsPerLS/(1e6)
-                tightVertices_xsec[0]=tightVertices[0]/BestLumi_integrated[0]*totalOrbitsPerLS
-                tightVertices_eff[0]=tightVertices_xsec[0]/xsec_ub
-                validVertices_Lumi[0]=validVertices[0]*totalOrbitsPerLS
-                validVertices_xsec[0]=validVertices[0]/BestLumi_integrated[0]*totalOrbitsPerLS
-                validVertices_eff[0]=validVertices_xsec[0]/xsec_ub
-                ibx=0
-                for bxid in bxids:
-                    # FIXME I should really use the lumi for this bx and not multiply by number of bxs
-                    goodVertices_Lumi_perBX[ibx]=goodVertices_Lumi_perBX[ibx]*totalOrbitsPerLS/(1e6)
-                    goodVertices_perBX_xsec[ibx]=goodVertices_perBX[ibx]/BestLumi_integrated[0]*math.pow(2,18)*nActiveBX[0]
-                    goodVertices_perBX_eff[ibx]=goodVertices_perBX_xsec[ibx]/xsec_ub
-                    tightVertices_Lumi_perBX[ibx]=tightVertices_Lumi_perBX[ibx]*totalOrbitsPerLS/(1e6)
-                    tightVertices_perBX_xsec[ibx]=tightVertices_perBX[ibx]/BestLumi_integrated[0]*math.pow(2,18)*nActiveBX[0]
-                    tightVertices_perBX_eff[ibx]=tightVertices_perBX_xsec[ibx]/xsec_ub
-                    validVertices_Lumi_perBX[ibx]=validVertices_perBX[ibx]*totalOrbitsPerLS
-                    validVertices_perBX_xsec[ibx]=validVertices_perBX[ibx]/BestLumi_integrated[0]*math.pow(2,18)*nActiveBX[0]
-                    validVertices_perBX_eff[ibx]=validVertices_perBX_xsec[ibx]/xsec_ub
-                    ibx=ibx+1
+            PC_xsec[0]=nCluster[0]/BestLumi[0]/t_LS*totalOrbitsPerLS
             
             for layer in range(0,5):
-                PC_xsec_layers[layer]=nPCPerLayer[layer]/BestLumi_integrated[0]*totalOrbitsPerLS
+                PC_xsec_layers[layer]=nPCPerLayer[layer]/BestLumi[0]/t_LS*totalOrbitsPerLS
             if BestLumi_PU[0]==0 and BestLumi[0]>0 and nActiveBX[0]>0:
                 BestLumi_PU[0]=BestLumi[0]*xsec_ub/nActiveBX[0]/f_LHC
             

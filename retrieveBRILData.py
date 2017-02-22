@@ -59,12 +59,16 @@ def CallBrilcalcForLumiAndProcess(onlineLumiDict,type="best"):
         if type is "best":
             lumiCMD.extend(["--normtag", "/afs/cern.ch/user/c/cmsbril/public/2016normtags/normtag_BRIL.json"])
         if type is "PLTZERO":
-            lumiCMD.extend(["--normtag", "/afs/cern.ch/user/c/cmsbril/public/2016normtags/normtag_pltzero.json"])
+            lumiCMD.extend(["--normtag", "pltzero16v3"])
         if type is "HFOC":
-            lumiCMD.extend(["--normtag", "/afs/cern.ch/user/c/cmsbril/public/2016normtags/normtag_hfoc.json"])
+            lumiCMD.extend(["--normtag", "hfoc16v4pre1"])
+        if type is "HFET":
+            lumiCMD.extend(["--normtag", "hfet16v2"])
         if type is "BCM1F":
-            lumiCMD.extend(["--normtag", "/afs/cern.ch/user/c/cmsbril/public/2016normtags/normtag_bcm1f.json"])
-    if type is not "best":
+            lumiCMD.extend(["--normtag", "bcm1f16v1"])
+        if type is "PCC":
+            lumiCMD.extend(["--normtag", "pccLUM17001pre2"])
+    elif type is not "best":
         lumiCMD.append("--type="+type)
     print lumiCMD
     lumiOutput=subprocess.check_output(lumiCMD)
@@ -168,7 +172,7 @@ onlineLumi={}
 if args.nbxfromhfonly:
     types=["HFOC"]
 else:
-    types=["best","PLTZERO","HFOC","BCM1F"]
+    types=["best","PLTZERO","HFOC","HFET","PCC"]
 
 print "args.nbxfromhfonly,args.beamonly,types",args.nbxfromhfonly,args.beamonly,types 
 if not args.beamonly:
