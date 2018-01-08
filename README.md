@@ -20,8 +20,20 @@
   
   
   
+# Luminosity comparisons
+
+Get csv files from brilcalc using normtag_LUMINOMETER.json to filter bad data.  
+Examples below:
+
+for nt in normtag_hfet.json normtag_dt.json normtag_pcc.json normtag_hfoc.json normtag_bcm1f.json;
+  do
+    brilcalc lumi --normtag=${nt} -i /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/Final/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON_MuonPhys.txt -u 'hz/ub' -o ${nt}.csv --output-style=csv --byls --tssec
+  done
   
-# Certification Instructions
+python compareTwoCSVsFromBRILCALC.py normtag_dt.json.csv normtag_hfet.json.csv NBX_perFill_2017.csv DTHFET
+
+
+# Certification Instructions (Mostly depricated)
 
 DataCert is weekly certification of luminosity for CMS data  
 
