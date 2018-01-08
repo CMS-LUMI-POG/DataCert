@@ -83,7 +83,7 @@ Output:  dataCertification_254227_254332_BRILONLY.root
 
 
 
-###mkAndSubmitJobs.py
+### mkAndSubmitJobs.py
 Most of the time you will use this script as a wrapper for makeDataCertTree.py.
 
 E.g.  
@@ -95,7 +95,7 @@ the jobs batch-wise only run,LS entries with CMS and BRIL data are saved (-b opt
 
 
 
-###hadd step
+### hadd step
 After successfully getting all the output back from your jobs. You need to (by 
 hand) hadd the root files:  
 E.g.  
@@ -105,7 +105,7 @@ hadd dataCertification_246908_248038_merged.root MyJobsGoInThisDir/dataCertifica
 
 
 
-###createJSONOfRunLS.py
+### createJSONOfRunLS.py
 Only entries with both CMS and BRIL data are saved here.  You need to add run,LS 
 entries where there are no pixel clusters and only BRIL luminometers have provided 
 data.  Using this script is the first step in that process.  It reads all the 
@@ -136,7 +136,7 @@ hadd -f dataCertification_246908_248038_complete.root dataCertification_246908_2
 
 
 
-###dataCertPlots.py
+### dataCertPlots.py
 To look in the tree and auto generate a list of runs use -a:  
 E.g.  
 ```
